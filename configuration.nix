@@ -11,10 +11,21 @@
 boot.loader.systemd-boot.enable = true;
 boot.loader.efi.canTouchEfiVariables = true;
 
+boot.initrd.systemd.enable = true;       # initramfs
+
   # 3. Networking
 # Networking
 networking.hostName = "nix";
 networking.networkmanager.enable = true;
+
+
+networking.firewall = {
+  enable = true;
+
+  allowedTCPPorts = [
+    25565
+  ];
+};
 
   # 4. Localization
 time.timeZone = "Europe/Budapest";
@@ -47,6 +58,14 @@ users.users.gergo = {
   ];
 };
 
+users.users.public = {
+  isSystemUser = true;
+  group = "public";
+  shell = pkgs.nologin;
+};
+
+users.groups.public = {};
+
   # 6. Packages
 environment.systemPackages = with pkgs; [
   # Editors
@@ -62,13 +81,149 @@ environment.systemPackages = with pkgs; [
   tree
   unzip
   zip
+
+  # System
+  networkmanager-openvpn
+
+  #desktop
+  waybar
+  hyprpaper
+  hyprlock
+  hyprpolkitagent
+  rofi-wayland
+  terminator
+  doublecmd
+  librewolf
+  qbittorrent
+  swaynotificationcenter
+  wl-clipboard
+  cliphist
+  playerctl
+  usbguard-notifier
+  pavucontrol
+
+  libsForQt5.qtwayland
+  qt6.qtwayland
+
+  # Desktop / utilities
+  vlc
+  qalculate-qt
+  thunderbird
+  keepassxc
+  gimp
+  audacious
+  vesktop
+
+  # Gaming
+  lutris
+  prismlauncher
+
+  # Development
+  dbeaver-bin
+  jetbrains.rider
+  jetbrains.webstorm
+
+  # HTTP client
+  bruno
 ];
 
   # 7. Services
-  # services....
+# Login manager
+services.greetd = {
+  enable = true;
+
+  settings = {
+    terminal.vt = 2;
+
+    default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet -t -r -c 'uwsm start select'";
+      user = "greeter";
+    };
+  };
+};
+
+services.usbguard = {
+  enable = true;
+  dbus.enable = true;
+};
+
+services.postgresql = {
+  enable = true;
+};
+
+services.mysql = {
+  enable = true;
+  package = pkgs.mariadb;
+};
+
+
+services.samba = {
+  enable = true;
+  openFirewall = true;
+
+  settings = {
+    global = {
+      workgroup = "WORKGROUP";
+      "server string" = "Public LAN File Share";
+
+      "server min protocol" = "SMB2";
+      "server max protocol" = "SMB3";
+
+      security = "user";
+
+      "hosts allow" =
+        "127. 10. 172.16.0.0/12 192.168. ::1 fe80::/10 fc00::/7";
+      "hosts deny" = "0.0.0.0/0 ::";
+
+      "log file" = "/var/log/samba/%m.log";
+      "log level" = "1";
+    };
+
+    public = {
+      path = "/srv/smb/public";
+      writable = true;
+
+      "valid users" = "public";
+      "force user" = "public";
+      "force group" = "public";
+
+      "create mask" = "0666";
+      "directory mask" = "0777";
+      "force create mode" = "0666";
+      "force directory mode" = "0777";
+    };
+  };
+};
+system.activationScripts.sambaPublicUser = ''
+  if ! ${pkgs.samba}/bin/pdbedit -L | ${pkgs.gnugrep}/bin/grep -q '^public:'; then
+    ${pkgs.samba}/bin/smbpasswd -a -s public <<EOF
+public
+public
+EOF
+  fi
+'';
+
+# Audio
+services.pipewire = {
+  enable = true;
+  alsa.enable = true;
+  alsa.support32Bit = true;
+  pulse.enable = true;
+  jack.enable = true;
+};
 
   # 8. Programs
-  # programs....
+# Hyprland
+programs.hyprland = {
+  enable = true;
+  withUWSM = true;
+};
+environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
+programs.steam.enable = true;
+
+
+programs.nix-ld.enable = true;
 
   # 9. Nix configuration
 # Nix
@@ -76,6 +231,7 @@ nix.settings.experimental-features = [
   "nix-command"
   "flakes"
 ];
+
 
   # 10. NixOS compatibility version
   system.stateVersion = "26.05";
