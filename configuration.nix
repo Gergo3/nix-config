@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   # 1. Imports
@@ -12,6 +12,9 @@ boot.loader.systemd-boot.enable = true;
 boot.loader.efi.canTouchEfiVariables = true;
 
 boot.initrd.systemd.enable = true;       # initramfs
+
+boot.blacklistedKernelModules = [ "nouveau" ];
+
 
   # 3. Networking
 # Networking
@@ -61,7 +64,7 @@ users.users.gergo = {
 users.users.public = {
   isSystemUser = true;
   group = "public";
-  shell = pkgs.nologin;
+  shell = "${pkgs.util-linux}/sbin/nologin";
 };
 
 users.groups.public = {};
@@ -75,6 +78,8 @@ environment.systemPackages = with pkgs; [
   git
   wget
   curl
+  gnupg
+  pinentry-qt
 
   # System utilities
   htop
@@ -90,7 +95,7 @@ environment.systemPackages = with pkgs; [
   hyprpaper
   hyprlock
   hyprpolkitagent
-  rofi-wayland
+  rofi
   terminator
   doublecmd
   librewolf
@@ -133,7 +138,9 @@ services.greetd = {
   enable = true;
 
   settings = {
-    terminal.vt = 2;
+
+    terminal.vt = lib.mkForce 2;
+
 
     default_session = {
       command = "${pkgs.tuigreet}/bin/tuigreet -t -r -c 'uwsm start select'";
@@ -145,6 +152,22 @@ services.greetd = {
 services.usbguard = {
   enable = true;
   dbus.enable = true;
+
+  rules = ''
+    allow id 1d6b:0002
+    allow id 1d6b:0003
+    allow id 1d6b:0002
+    allow id 1d6b:0003
+    allow id 1d6b:0002
+    allow id 1d6b:0003
+    allow id 1d6b:0002
+    allow id 1d6b:0003
+    
+    allow id 09da:90c0
+    
+    allow id 09da:56c6
+  
+  '';
 };
 
 services.postgresql = {
@@ -231,6 +254,9 @@ nix.settings.experimental-features = [
   "nix-command"
   "flakes"
 ];
+
+nixpkgs.config.allowUnfree = true;
+
 
 
   # 10. NixOS compatibility version
