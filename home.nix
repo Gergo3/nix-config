@@ -265,7 +265,7 @@ in
     "uwsm/env".text = ''
       export XCURSOR_SIZE=24
       export QT_QPA_PLATFORMTHEME=qt5ct
-      export QT_STYLE_OVERRIDE="kvantum"
+      export QT_STYLE_OVERRIDE=kvantum
     '';
 
     "uwsm/env-hyprland".text = ''
