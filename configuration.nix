@@ -110,6 +110,9 @@ environment.systemPackages = with pkgs; [
   libsForQt5.qtwayland
   qt6.qtwayland
 
+
+  yt-dlp
+
   # Desktop / utilities
   vlc
   qalculate-qt
@@ -117,7 +120,6 @@ environment.systemPackages = with pkgs; [
   keepassxc
   gimp
   audacious
-  vesktop
 
   # Gaming
   lutris
@@ -125,7 +127,7 @@ environment.systemPackages = with pkgs; [
 
   # Development
   dbeaver-bin
-  jetbrains.rider
+  #jetbrains.rider
   jetbrains.webstorm
 
   # HTTP client
@@ -147,6 +149,10 @@ services.greetd = {
       user = "greeter";
     };
   };
+};
+
+services.flatpak = {
+  enable = true;
 };
 
 services.usbguard = {

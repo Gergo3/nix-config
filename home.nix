@@ -1,6 +1,19 @@
 { pkgs, lib, ... }:
 
 let
+
+  riderDotnet = pkgs.buildFHSEnv {
+    name = "rider-dotnet";
+
+    targetPkgs = pkgs: with pkgs; [
+      jetbrains.rider
+      dotnet-sdk_10
+    ];
+
+    runScript = "${pkgs.jetbrains.rider}/bin/rider";
+  };
+
+
   terminal = "terminator";
   fileManager = "doublecmd";
   menu = "rofi -show drun";
@@ -223,10 +236,36 @@ in
     };
   };
 
+  home.packages = [
+    riderDotnet
+  ];
+
+  qt = {
+    enable = true;
+
+    style = {
+      name = "kvantum";
+      package = pkgs.kdePackages.qtstyleplugin-kvantum;
+    };
+  };
+
+  xdg.desktopEntries.rider-dotnet = {
+    name = "Rider (fhs)";
+    comment = "JetBrains Rider with fhs wrapper";
+    exec = "${riderDotnet}/bin/rider-dotnet %U";
+    icon = "${pkgs.jetbrains.rider}/share/icons/hicolor/scalable/apps/rider.svg";
+    terminal = false;
+    categories = [
+      "Development"
+      "IDE"
+    ];
+  };
+
   xdg.configFile = {
     "uwsm/env".text = ''
       export XCURSOR_SIZE=24
       export QT_QPA_PLATFORMTHEME=qt5ct
+      export QT_STYLE_OVERRIDE="kvantum"
     '';
 
     "uwsm/env-hyprland".text = ''
