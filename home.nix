@@ -177,6 +177,14 @@ in
         workspace = "10",
         no_initial_focus = true,
       })
+
+      -- Force thunderbird to open on monitor 1 and workspace 9
+      hl.window_rule({
+        match = { class = "thunderbird" },
+        monitor = "1",
+        workspace = "9",
+        no_initial_focus = true,
+      })
     
       -- XWayland
       hl.config({
@@ -274,8 +282,17 @@ in
     "uwsm/env-hyprland".text = ''
       export HYPRCURSOR_SIZE=24
     '';
+    "autostart/vesktop.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=Vesktop
+      Comment=Vesktop autostart
+      Exec=flatpak run dev.vencord.Vesktop
+      Terminal=false
+    '';
   };
 
+/*
   xdg.configFile."autostart/vesktop.desktop".text = ''
     [Desktop Entry]
     Type=Application
@@ -293,6 +310,7 @@ in
     Terminal=false
     X-GNOME-Autostart-enabled=true
   '';
+*/
 
   systemd.user.services = {
 
