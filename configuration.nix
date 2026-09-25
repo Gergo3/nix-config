@@ -145,7 +145,7 @@ services.greetd = {
 
 
     default_session = {
-      command = "${pkgs.tuigreet}/bin/tuigreet -t -r -c 'uwsm start select'";
+      command = "${pkgs.tuigreet}/bin/tuigreet -t -r -c 'uwsm start default'";
       user = "greeter";
     };
   };

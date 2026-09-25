@@ -30,6 +30,9 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
 
+    #enableing this conflicts with uwsm
+    systemd.enable = false;
+
     extraConfig = ''
       hl.bind("${mainMod} + Q", hl.dsp.exec_cmd("${terminal}"))
       hl.bind("${mainMod} + C", hl.dsp.window.close())
