@@ -108,6 +108,7 @@ environment.systemPackages = with pkgs; [
   pavucontrol
 
   libsForQt5.qtwayland
+  libsForQt5.qt5ct
   qt6.qtwayland
 
 

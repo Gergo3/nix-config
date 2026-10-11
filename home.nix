@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ inputs, pkgs, lib, ... }:
 
 let
 
@@ -33,7 +33,17 @@ in
     #enableing this conflicts with uwsm
     systemd.enable = false;
 
+    extraLuaFiles = {
+      # create a symlink to `.config/hypr/hyprsplit/init.lua`.
+      "hyprsplit/init" = {
+        autoLoad = false;
+        content = builtins.readFile "${inputs.hyprsplit.packages.${pkgs.system}.hyprsplitlua}/share/hyprsplit/init.lua";
+      };
+    };
+
     extraConfig = ''
+      local hs = require("hyprsplit")
+
       hl.bind("${mainMod} + Q", hl.dsp.exec_cmd("${terminal}"))
       hl.bind("${mainMod} + C", hl.dsp.window.close())
       hl.bind("${mainMod} + M", hl.dsp.exec_cmd("uwsm stop"))
@@ -61,38 +71,38 @@ in
       hl.bind("${mainMod} + DOWN", hl.dsp.focus({ direction = "d" }))
 
       -- Switch workspaces
-      hl.bind("${mainMod} + 1", hl.dsp.focus({ workspace = "1" }))
-      hl.bind("${mainMod} + 2", hl.dsp.focus({ workspace = "2" }))
-      hl.bind("${mainMod} + 3", hl.dsp.focus({ workspace = "3" }))
-      hl.bind("${mainMod} + 4", hl.dsp.focus({ workspace = "4" }))
-      hl.bind("${mainMod} + 5", hl.dsp.focus({ workspace = "5" }))
-      hl.bind("${mainMod} + 6", hl.dsp.focus({ workspace = "6" }))
-      hl.bind("${mainMod} + 7", hl.dsp.focus({ workspace = "7" }))
-      hl.bind("${mainMod} + 8", hl.dsp.focus({ workspace = "8" }))
-      hl.bind("${mainMod} + 9", hl.dsp.focus({ workspace = "9" }))
-      hl.bind("${mainMod} + 0", hl.dsp.focus({ workspace = "10" }))
+      hl.bind("${mainMod} + 1", hs.dsp.focus({ workspace = "1" }))
+      hl.bind("${mainMod} + 2", hs.dsp.focus({ workspace = "2" }))
+      hl.bind("${mainMod} + 3", hs.dsp.focus({ workspace = "3" }))
+      hl.bind("${mainMod} + 4", hs.dsp.focus({ workspace = "4" }))
+      hl.bind("${mainMod} + 5", hs.dsp.focus({ workspace = "5" }))
+      hl.bind("${mainMod} + 6", hs.dsp.focus({ workspace = "6" }))
+      hl.bind("${mainMod} + 7", hs.dsp.focus({ workspace = "7" }))
+      hl.bind("${mainMod} + 8", hs.dsp.focus({ workspace = "8" }))
+      hl.bind("${mainMod} + 9", hs.dsp.focus({ workspace = "9" }))
+      hl.bind("${mainMod} + 0", hs.dsp.focus({ workspace = "10" }))
     
       -- Move active window to a workspace
       hl.bind("${mainMod} + SHIFT + 1",
-        hl.dsp.window.move({ workspace = "1" }))
+        hs.dsp.window.move({ workspace = "1" }))
       hl.bind("${mainMod} + SHIFT + 2",
-        hl.dsp.window.move({ workspace = "2" }))
+        hs.dsp.window.move({ workspace = "2" }))
       hl.bind("${mainMod} + SHIFT + 3",
-        hl.dsp.window.move({ workspace = "3" }))
+        hs.dsp.window.move({ workspace = "3" }))
       hl.bind("${mainMod} + SHIFT + 4",
-        hl.dsp.window.move({ workspace = "4" }))
+        hs.dsp.window.move({ workspace = "4" }))
       hl.bind("${mainMod} + SHIFT + 5",
-        hl.dsp.window.move({ workspace = "5" }))
+        hs.dsp.window.move({ workspace = "5" }))
       hl.bind("${mainMod} + SHIFT + 6",
-        hl.dsp.window.move({ workspace = "6" }))
+        hs.dsp.window.move({ workspace = "6" }))
       hl.bind("${mainMod} + SHIFT + 7",
-        hl.dsp.window.move({ workspace = "7" }))
+        hs.dsp.window.move({ workspace = "7" }))
       hl.bind("${mainMod} + SHIFT + 8",
-        hl.dsp.window.move({ workspace = "8" }))
+        hs.dsp.window.move({ workspace = "8" }))
       hl.bind("${mainMod} + SHIFT + 9",
-        hl.dsp.window.move({ workspace = "9" }))
+        hs.dsp.window.move({ workspace = "9" }))
       hl.bind("${mainMod} + SHIFT + 0",
-        hl.dsp.window.move({ workspace = "10" }))
+        hs.dsp.window.move({ workspace = "10" }))
 
       -- Move/resize windows with mainMod + LMB/RMB and dragging
       hl.bind("${mainMod} + mouse:272", hl.dsp.window.drag(), { mouse = true })
@@ -247,7 +257,7 @@ in
     };
   };
 
-  home.packages = [
+  home.packages = with pkgs; [
     riderDotnet
   ];
 
@@ -256,7 +266,7 @@ in
 
     style = {
       name = "kvantum";
-      package = pkgs.kdePackages.qtstyleplugin-kvantum;
+      #package = pkgs.kdePackages.qtstyleplugin-kvantum;
     };
   };
 
@@ -275,8 +285,6 @@ in
   xdg.configFile = {
     "uwsm/env".text = ''
       export XCURSOR_SIZE=24
-      export QT_QPA_PLATFORMTHEME=qt5ct
-      export QT_STYLE_OVERRIDE=kvantum
     '';
 
     "uwsm/env-hyprland".text = ''
