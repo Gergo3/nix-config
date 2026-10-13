@@ -180,19 +180,19 @@ in
         no_focus = true,
       })
     
-      -- Force Vesktop to open on monitor 1 and workspace 10
+      -- Force Vesktop to open on monitor 1 and workspace 20
       hl.window_rule({
         match = { class = "vesktop" },
         monitor = "1",
-        workspace = "10",
+        workspace = "20",
         no_initial_focus = true,
       })
 
-      -- Force thunderbird to open on monitor 1 and workspace 9
+      -- Force thunderbird to open on monitor 1 and workspace 19
       hl.window_rule({
         match = { class = "thunderbird" },
         monitor = "1",
-        workspace = "9",
+        workspace = "19",
         no_initial_focus = true,
       })
     

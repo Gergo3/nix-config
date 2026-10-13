@@ -265,7 +265,11 @@ nix.settings.experimental-features = [
 nixpkgs.config.allowUnfree = true;
 
 
+  # 10. Virtualisation
+  virtualisation.docker.enable = true;
 
-  # 10. NixOS compatibility version
+
+
+  # 11. NixOS compatibility version
   system.stateVersion = "26.05";
 }
