@@ -293,6 +293,7 @@ in
     "autostart/vesktop.desktop".text = ''
       [Desktop Entry]
       Type=Application
+      Icon=com.discordapp.Discord
       Name=Vesktop
       Comment=Vesktop autostart
       Exec=flatpak run dev.vencord.Vesktop
