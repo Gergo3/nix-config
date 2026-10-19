@@ -160,6 +160,8 @@ services.usbguard = {
   enable = true;
   dbus.enable = true;
 
+  IPCAllowedUsers = [ "root" "gergo" ];
+
   rules = ''
     allow id 1d6b:0002
     allow id 1d6b:0003

@@ -259,6 +259,8 @@ in
 
   home.packages = with pkgs; [
     riderDotnet
+    zathura
+    libreoffice-qt
   ];
 
   qt = {
