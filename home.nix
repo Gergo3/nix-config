@@ -108,6 +108,8 @@ in
       hl.bind("${mainMod} + mouse:272", hl.dsp.window.drag(), { mouse = true })
       hl.bind("${mainMod} + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
+      hl.bind("PRINT", hl.dsp.exec_cmd("grim - | satty -f -"))
+
       -- Volume
       hl.bind(
         "XF86AudioRaiseVolume",
@@ -261,6 +263,8 @@ in
     riderDotnet
     zathura
     libreoffice-qt
+    grim
+    satty
   ];
 
   qt = {

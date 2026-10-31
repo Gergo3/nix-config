@@ -244,6 +244,34 @@ services.pipewire = {
   jack.enable = true;
 };
 
+
+# Graphics
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true; # useful for Steam/gaming
+  };
+
+  services.xserver.videoDrivers = [ "nvidia" ];
+
+  hardware.nvidia = {
+    modesetting.enable = false;
+
+    # Recommended for Turing+ GPUs:
+    # RTX 20/30/40/50 series, GTX 16 series, etc.
+    open = true;
+
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
+
+      amdgpuBusId = "PCI:9@0:0:0";
+
+      nvidiaBusId = "PCI:1@0:0:0";
+    };
+  };
+
   # 8. Programs
 # Hyprland
 programs.hyprland = {

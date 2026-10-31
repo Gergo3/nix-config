@@ -19,19 +19,22 @@
       modules = [
         ./configuration.nix
 
-          home-manager.nixosModules.home-manager
+        home-manager.nixosModules.home-manager
 
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
 
-            home-manager.users.gergo = import ./home.nix;
+          # Back up conflicting files instead of failing
+          home-manager.backupFileExtension = "backup";
 
-            home-manager.extraSpecialArgs = {
-              inherit inputs;
-            };
+          home-manager.users.gergo = import ./home.nix;
 
-          }
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
+          };
+
+        }
       ];
     };
   };
