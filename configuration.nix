@@ -11,8 +11,6 @@
 boot.loader.systemd-boot.enable = true;
 boot.loader.efi.canTouchEfiVariables = true;
 
-boot.initrd.systemd.enable = true;       # initramfs
-
 boot.blacklistedKernelModules = [ "nouveau" ];
 
 
@@ -179,6 +177,11 @@ services.usbguard = {
   '';
 };
 
+services.ollama = {
+  enable = true;
+  package = pkgs.ollama-cuda;
+};
+
 services.postgresql = {
   enable = true;
 };
@@ -291,6 +294,18 @@ nix.settings.experimental-features = [
   "nix-command"
   "flakes"
 ];
+
+  nix.settings = {
+    extra-substituters = [
+      "https://cache.nixos-cuda.org"
+      "https://cache.flox.dev"
+    ];
+
+    extra-trusted-public-keys = [
+      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+      "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
+    ];
+  };
 
 nixpkgs.config.allowUnfree = true;
 

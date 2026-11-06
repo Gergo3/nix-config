@@ -265,6 +265,7 @@ in
     libreoffice-qt
     grim
     satty
+    opencode
   ];
 
   qt = {
