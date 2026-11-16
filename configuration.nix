@@ -17,7 +17,13 @@ boot.blacklistedKernelModules = [ "nouveau" ];
   # 3. Networking
 # Networking
 networking.hostName = "nix";
-networking.networkmanager.enable = true;
+
+networking.networkmanager = {
+  enable = true;
+  plugins = with pkgs; [
+    networkmanager-openvpn
+  ];
+};
 
 
 networking.firewall = {
@@ -25,6 +31,10 @@ networking.firewall = {
 
   allowedTCPPorts = [
     25565
+  ];
+
+  allowedUDPPorts = [
+    47584
   ];
 };
 
@@ -86,7 +96,7 @@ environment.systemPackages = with pkgs; [
   zip
 
   # System
-  networkmanager-openvpn
+  #networkmanager-openvpn
 
   #desktop
   waybar
@@ -153,6 +163,8 @@ services.greetd = {
 services.flatpak = {
   enable = true;
 };
+
+services.gvfs.enable = true;
 
 services.usbguard = {
   enable = true;
@@ -312,6 +324,40 @@ nixpkgs.config.allowUnfree = true;
 
   # 10. Virtualisation
   virtualisation.docker.enable = true;
+
+  virtualisation.oci-containers.backend = "docker";
+
+  environment.etc."seaweedfs/s3.json".text = builtins.toJSON {
+    identities = [{
+      name = "dev";
+      credentials = [{ accessKey = "devkey"; secretKey = "devsecret"; }];
+      actions = [ "Admin" "Read" "Write" "List" "Tagging" ];
+    }];
+  };
+
+  systemd.tmpfiles.rules = [ "d /var/lib/seaweedfs 0750 root root -" ];
+
+  virtualisation.oci-containers.containers.seaweedfs = {
+    image = "chrislusf/seaweedfs:latest";   # pin a version tag once things work
+    cmd = [
+      "server"
+      "-dir=/data"
+      "-master.volumeSizeLimitMB=256"
+      "-volume.max=100"
+      "-filer"
+      "-s3"
+      "-s3.config=/etc/seaweedfs/s3.json"
+    ];
+    volumes = [
+      "/var/lib/seaweedfs:/data"
+      "/etc/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro"
+    ];
+    ports = [
+      "127.0.0.1:8333:8333"   # S3 API
+      "127.0.0.1:8888:8888"   # filer UI
+      "127.0.0.1:9333:9333"   # master UI
+    ];
+  };
 
 
 
