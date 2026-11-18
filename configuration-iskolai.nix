@@ -3,7 +3,7 @@
 {
   # 1. Imports
   imports = [
-    ./hardware-configuration.nix
+    ./hardware-configuration-iskolai.nix
   ];
 
   # 2. Boot
@@ -11,12 +11,10 @@
 boot.loader.systemd-boot.enable = true;
 boot.loader.efi.canTouchEfiVariables = true;
 
-boot.blacklistedKernelModules = [ "nouveau" ];
-
 
   # 3. Networking
 # Networking
-networking.hostName = "nix";
+networking.hostName = "PC3_14";
 
 networking.networkmanager = {
   enable = true;
@@ -28,14 +26,6 @@ networking.networkmanager = {
 
 networking.firewall = {
   enable = true;
-
-  allowedTCPPorts = [
-    25565
-  ];
-
-  allowedUDPPorts = [
-    47584
-  ];
 };
 
   # 4. Localization
@@ -69,14 +59,6 @@ users.users.gergo = {
   ];
 };
 
-users.users.public = {
-  isSystemUser = true;
-  group = "public";
-  shell = "${pkgs.util-linux}/sbin/nologin";
-};
-
-users.groups.public = {};
-
   # 6. Packages
 environment.systemPackages = with pkgs; [
   # Editors
@@ -94,9 +76,6 @@ environment.systemPackages = with pkgs; [
   tree
   unzip
   zip
-
-  # System
-  #networkmanager-openvpn
 
   #desktop
   waybar
@@ -130,10 +109,6 @@ environment.systemPackages = with pkgs; [
   gimp
   audacious
 
-  # Gaming
-  lutris
-  prismlauncher
-
   # Development
   dbeaver-bin
   #jetbrains.rider
@@ -166,34 +141,6 @@ services.flatpak = {
 
 services.gvfs.enable = true;
 
-services.usbguard = {
-  enable = true;
-  dbus.enable = true;
-
-  IPCAllowedUsers = [ "root" "gergo" ];
-
-  rules = ''
-    allow id 1d6b:0002
-    allow id 1d6b:0003
-    allow id 1d6b:0002
-    allow id 1d6b:0003
-    allow id 1d6b:0002
-    allow id 1d6b:0003
-    allow id 1d6b:0002
-    allow id 1d6b:0003
-    
-    allow id 09da:90c0
-    
-    allow id 09da:56c6
-  
-  '';
-};
-
-services.ollama = {
-  enable = true;
-  package = pkgs.ollama-cuda;
-};
-
 services.postgresql = {
   enable = true;
 };
@@ -202,53 +149,6 @@ services.mysql = {
   enable = true;
   package = pkgs.mariadb;
 };
-
-
-services.samba = {
-  enable = true;
-  openFirewall = true;
-
-  settings = {
-    global = {
-      workgroup = "WORKGROUP";
-      "server string" = "Public LAN File Share";
-
-      "server min protocol" = "SMB2";
-      "server max protocol" = "SMB3";
-
-      security = "user";
-
-      "hosts allow" =
-        "127. 10. 172.16.0.0/12 192.168. ::1 fe80::/10 fc00::/7";
-      "hosts deny" = "0.0.0.0/0 ::";
-
-      "log file" = "/var/log/samba/%m.log";
-      "log level" = "1";
-    };
-
-    public = {
-      path = "/srv/smb/public";
-      writable = true;
-
-      "valid users" = "public";
-      "force user" = "public";
-      "force group" = "public";
-
-      "create mask" = "0666";
-      "directory mask" = "0777";
-      "force create mode" = "0666";
-      "force directory mode" = "0777";
-    };
-  };
-};
-system.activationScripts.sambaPublicUser = ''
-  if ! ${pkgs.samba}/bin/pdbedit -L | ${pkgs.gnugrep}/bin/grep -q '^public:'; then
-    ${pkgs.samba}/bin/smbpasswd -a -s public <<EOF
-public
-public
-EOF
-  fi
-'';
 
 # Audio
 services.pipewire = {
@@ -266,27 +166,6 @@ services.pipewire = {
     enable32Bit = true; # useful for Steam/gaming
   };
 
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  hardware.nvidia = {
-    modesetting.enable = false;
-
-    # Recommended for Turing+ GPUs:
-    # RTX 20/30/40/50 series, GTX 16 series, etc.
-    open = true;
-
-    prime = {
-      offload = {
-        enable = true;
-        enableOffloadCmd = true;
-      };
-
-      amdgpuBusId = "PCI:9@0:0:0";
-
-      nvidiaBusId = "PCI:1@0:0:0";
-    };
-  };
-
   # 8. Programs
 # Hyprland
 programs.hyprland = {
@@ -294,9 +173,6 @@ programs.hyprland = {
   withUWSM = true;
 };
 environment.sessionVariables.NIXOS_OZONE_WL = "1";
-
-programs.steam.enable = true;
-
 
 programs.nix-ld.enable = true;
 
@@ -306,18 +182,6 @@ nix.settings.experimental-features = [
   "nix-command"
   "flakes"
 ];
-
-  nix.settings = {
-    extra-substituters = [
-      "https://cache.nixos-cuda.org"
-      "https://cache.flox.dev"
-    ];
-
-    extra-trusted-public-keys = [
-      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
-      "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
-    ];
-  };
 
 nixpkgs.config.allowUnfree = true;
 
